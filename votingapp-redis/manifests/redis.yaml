@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace : prod
+  labels:
+    app: redislb
+spec:
+  selector:
+    matchLabels:
+      app: redislb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redislb
+    spec:
+      volumes: 
+      - name: vol
+        persistentVolumeClaim:
+          claimName: redisclaim
+      containers:
+      - name: redis
+        image: redis
+        args: ["--requirepass","$(REDIS_PWD)"]
+        resources:
+          requests:
+            cpu: 250m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 500Mi
+        env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "no"
+        - name: REDIS_PWD
+          valueFrom:
+            secretKeyRef:
+              name: redispw
+              key: password
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: vol
+          mountPath: "/data"
+

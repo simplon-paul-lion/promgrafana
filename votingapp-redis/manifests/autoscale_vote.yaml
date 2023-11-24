@@ -3,7 +3,6 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: autoscalevote
-  namespace : prod
 spec:
   maxReplicas: 8
   minReplicas: 1
@@ -12,5 +11,23 @@ spec:
     kind: Deployment
     name: voteapp
   targetCPUUtilizationPercentage: 70
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 70
+  status:
+    observedGeneration: 1
+    lastScaleTime: 
+      currentReplicas: 1
+      desiredReplicas: 1
+    currentMetrics:
+    - type: Resource
+      resource:
+        name: cpu
+        current:
+          averageUtilization: 0
+          averageValue: 0
+
 
 
